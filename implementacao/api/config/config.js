@@ -28,4 +28,5 @@ module.exports = {
         dialect: process.env.DB_DIALECT
     }
 };
-// npx sequelize-cli db:migrate:status --config "config/config.js" --env "development"
+// Dentro da pasta /api:
+// npx sequelize-cli db:migrate --config "config/config.js" --env "development"
