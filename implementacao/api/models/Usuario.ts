@@ -1,6 +1,4 @@
 import { Model, DataTypes, Sequelize, Optional } from "sequelize";
-import AppError from "../errors/AppError";
-
 
 export interface IAtributosUsuario {
   id: number,

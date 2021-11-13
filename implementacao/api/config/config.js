@@ -29,4 +29,5 @@ module.exports = {
     }
 };
 // Dentro da pasta /api:
-// npx sequelize-cli db:migrate --config "config/config.js" --env "development"
+// Criar migration: npx sequelize-cli model:generate --name Parceiro --attributes nome:string
+// Rodar migrations: npx sequelize-cli db:migrate --config "config/config.js" --env "development"

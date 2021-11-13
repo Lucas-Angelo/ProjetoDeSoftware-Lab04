@@ -1,6 +1,8 @@
 
 import dotenv from 'dotenv';
 import { Sequelize } from "sequelize";
+import Aluno from '../models/Aluno';
+import Parceiro from '../models/Parceiro';
 import Usuario from "../models/Usuario";
 
 dotenv.config();
@@ -21,7 +23,10 @@ export default {
     try {
       await sequelize.authenticate();
       Usuario.initialize(sequelize);
-      
+      Aluno.initialize(sequelize);
+      Parceiro.initialize(sequelize);
+
+      Aluno.belongsTo(Usuario, {foreignKey: "usuario_id", as: "usuario"});
 
       if (process.env.NODE_ENV === "dev") {
         console.log(

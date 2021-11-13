@@ -1,58 +1,42 @@
-import Usuario, { IAtributosUsuario, IAtributosUsuarioCriacao } from "../models/Usuario";
+import Aluno, { IAtributosAluno } from "../models/Aluno";
 
 import * as yup from 'yup'
-import { RequestHandler } from "express";
 import { CreateRequestHandler, DeleteRequestHandler, GetAllRequestHandler, GetRequestHandler, UpddateRequestHandler } from "../types/RequestHandlers";
+import Usuario from "../models/Usuario";
 
-interface ILoginUsuario {
-  usuario: string,
-  senha: string
-}
-
-type SigninReponse = string | {
-  autenticado: boolean,
-  razao?: "Senha incorreta!"
-}
-
-class UsuarioController {
-  public signin: RequestHandler<never, SigninReponse, ILoginUsuario> = async (req, res) => {
-    const { usuario, senha } = req.body;
-
-    Usuario.findOne({
-      attributes: ['id', 'senha'],
-      where: {
-        usuario: usuario
-      }
-    })
-      .then(usuario => {
-        if (!usuario) {
-          return res.status(404).send("Usuario nao encontrado.");
-        }
-
-        if (senha != usuario.get().senha) {
-          return res.status(401).send({
-            autenticado: false,
-            razao: "Senha incorreta!"
-          });
-        }
-
-        res.status(200).send({ autenticado: true });
-      })
-      .catch(err => {
-        res.status(500).send("Erro -> " + err);
-      });
-  }
+class AlunoController {
 
   public create: CreateRequestHandler = async (request, response) => {
     const scheme = yup.object().shape({
-      usuario: yup
+      usuario_id: yup
+        .number()
+        .required("'usuario_id' obrigatória!")
+        .required("'usuario_id' obrigatório!"),
+      nome: yup
         .string()
-        .required("'usuario' obrigatório!").max(100, "'usuario' deve ter no máximo 100 caracteres!"),
-      senha: yup
+        .required("'nome' obrigatória!")
+        .min(2, "'nome' deve ter no mínimo 2 caracteres!")
+        .max(120, "'nome' deve ter no máximo 120 caracteres!"),
+      email: yup
         .string()
-        .required("'senha' obrigatória!")
-        .min(8, "'senha' deve ter no mínimo 8 caracteres!")
-        .max(64, "'senha' deve ter no máximo 64 caracteres!")
+        .required("'email' obrigatória!")
+        .min(2, "'email' deve ter no mínimo 2 caracteres!")
+        .max(120, "'email' deve ter no máximo 120 caracteres!"),
+      rg: yup
+        .string()
+        .required("'rg' obrigatória!")
+        .min(2, "'rg' deve ter no mínimo 2 caracteres!")
+        .max(120, "'rg' deve ter no máximo 120 caracteres!"),
+      endereco: yup
+        .string()
+        .required("'endereco' obrigatória!")
+        .min(2, "'endereco' deve ter no mínimo 2 caracteres!")
+        .max(120, "'endereco' deve ter no máximo 120 caracteres!"),
+      cpf: yup
+        .string()
+        .required("'cpf' obrigatória!")
+        .min(2, "'cpf' deve ter no mínimo 2 caracteres!")
+        .max(120, "'cpf' deve ter no máximo 120 caracteres!"),
     });
 
     // Validando com o esquema criado:
@@ -66,19 +50,18 @@ class UsuarioController {
       });
     }
 
-    const { usuario, senha } = request.body;
+    const { usuario_id, nome, email, rg, endereco, cpf } = request.body;
 
-    const user = Usuario.build({
-      usuario,
-      senha: senha
+    const aluno = Aluno.build({
+      usuario_id, nome, email, rg, endereco, cpf, saldo: 0
     });
 
-    user
+    aluno
       .save()
       .then(() => {
         return response.status(201).json({
           criado: true,
-          id: user.id
+          id: aluno.id
         });
       })
       .catch((erro) => {
@@ -91,7 +74,7 @@ class UsuarioController {
 
   // URI de exemplo: http://localhost:3000/api/usuario/1
   public delete: DeleteRequestHandler = async (request, response) => {
-    const usuario = await Usuario.findOne({
+    const usuario = await Aluno.findOne({
       where: {
         id: request.params.id
       }
@@ -103,7 +86,7 @@ class UsuarioController {
       });
     }
 
-    await Usuario.destroy({
+    await Aluno.destroy({
       where: {
         id: request.params.id
       }
@@ -123,14 +106,31 @@ class UsuarioController {
   }
 
   // URI de exemplo: http://localhost:3000/api/usuario/1
-  public update: UpddateRequestHandler<IAtributosUsuario> = async (request, response) => {
+  public update: UpddateRequestHandler<IAtributosAluno> = async (request, response) => {
 
     const scheme = yup.object().shape({
-      senha: yup
+      nome: yup
         .string()
-        .required("'senha' obrigatória!")
-        .min(8, "'senha' deve ter no mínimo 8 caracteres!")
-        .max(64, "'senha' deve ter no máximo 64 caracteres!")
+        .min(2, "'nome' deve ter no mínimo 2 caracteres!")
+        .max(120, "'nome' deve ter no máximo 120 caracteres!"),
+      email: yup
+        .string()
+        .min(2, "'email' deve ter no mínimo 2 caracteres!")
+        .max(120, "'email' deve ter no máximo 120 caracteres!"),
+      rg: yup
+        .string()
+        .min(2, "'rg' deve ter no mínimo 2 caracteres!")
+        .max(120, "'rg' deve ter no máximo 120 caracteres!"),
+      endereco: yup
+        .string()
+        .min(2, "'endereco' deve ter no mínimo 2 caracteres!")
+        .max(120, "'endereco' deve ter no máximo 120 caracteres!"),
+      cpf: yup
+        .string()
+        .min(2, "'cpf' deve ter no mínimo 2 caracteres!")
+        .max(120, "'cpf' deve ter no máximo 120 caracteres!"),
+      saldo: yup
+        .number()
     });
 
     // Validando com o esquema criado:
@@ -144,9 +144,9 @@ class UsuarioController {
       });
     }
 
-    const { senha } = request.body;
+    const { nome, email, rg, endereco, cpf, saldo } = request.body;
 
-    const usuario = await Usuario.findOne({
+    const usuario = await Aluno.findOne({
       where: {
         id: request.params.id
       }
@@ -154,12 +154,12 @@ class UsuarioController {
     if (!usuario) {
       response.status(404).json({
         atualizado: false,
-        nome: "Usuario não encontrado",
+        nome: "Aluno não encontrado",
         erros: "O id que foi solicitado alteração não existe no banco de dados"
       });
     } else {
       usuario.update({
-        senha: senha,
+        nome, email, rg, endereco, cpf, saldo
       });
       response.status(200).json({
         atualizado: true,
@@ -169,12 +169,17 @@ class UsuarioController {
   }
 
   // URI de exemplo: http://localhost:3000/api/usuario/1
-  public get: GetRequestHandler<IAtributosUsuario> = async (request, response) => {
+  public get: GetRequestHandler<IAtributosAluno> = async (request, response) => {
 
-    const usuario = await Usuario.findOne({
+    const usuario = await Aluno.findOne({
       where: {
         id: request.params.id
       },
+      include: [
+        {
+          model: Usuario, as: "usuario"
+        }
+      ],
       paranoid: false
     });
     if (!usuario) {
@@ -186,15 +191,17 @@ class UsuarioController {
 
   // URI de exemplo: http://localhost:3000/api/usuario?pagina=1&limite=5&atributo=nome&ordem=DESC
   // todos as querys são opicionais
-  public getAll: GetAllRequestHandler<IAtributosUsuario> = async (request, response) => {
+  public getAll: GetAllRequestHandler<IAtributosAluno> = async (request, response) => {
 
-    Usuario.findAndCountAll({
-      paranoid: false
+    Aluno.findAndCountAll({
+      paranoid: false,
+      include: [
+        {
+          model: Usuario, as: "usuario"
+        }
+      ],
     })
       .then(usuarios => {
-        Usuario.findAll({
-          paranoid: false
-        })
         response.status(200).json({
           dados: usuarios.rows,
           quantidade: usuarios.rows.length,
@@ -210,4 +217,4 @@ class UsuarioController {
   }
 }
 
-export default UsuarioController;
+export default AlunoController;
