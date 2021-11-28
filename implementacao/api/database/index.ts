@@ -4,6 +4,8 @@ import { Sequelize } from "sequelize";
 import Aluno from '../models/Aluno';
 import Parceiro from '../models/Parceiro';
 import Professor from '../models/Professor';
+import Transacao from '../models/Transacao';
+import TransacaoP from '../models/TransacaoP';
 import Usuario from "../models/Usuario";
 
 dotenv.config();
@@ -27,9 +29,19 @@ export default {
       Aluno.initialize(sequelize);
       Professor.initialize(sequelize);
       Parceiro.initialize(sequelize);
+      Transacao.initialize(sequelize);
+      TransacaoP.initialize(sequelize);
 
       Aluno.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
       Professor.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
+
+      Transacao.hasOne(TransacaoP, {foreignKey: "id", as: "transacaop"});
+
+      TransacaoP.belongsTo(Transacao, { foreignKey: "transacao_id", as: "transacao" });
+      TransacaoP.belongsTo(Professor, { foreignKey: "professor_id", as: "professor" });
+
+      Professor.hasMany(TransacaoP, { foreignKey: "professor_id", as: "transacoesp" });
+      Aluno.hasMany(Transacao, {foreignKey: "aluno_id", as: "transacoes"});
 
       if (process.env.NODE_ENV === "dev") {
         console.log(

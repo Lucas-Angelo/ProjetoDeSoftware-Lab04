@@ -3,6 +3,8 @@ import Aluno, { IAtributosAluno } from "../models/Aluno";
 import * as yup from 'yup'
 import { CreateRequestHandler, DeleteRequestHandler, GetAllRequestHandler, GetRequestHandler, UpddateRequestHandler } from "../types/RequestHandlers";
 import Usuario from "../models/Usuario";
+import Transacao from "../models/Transacao";
+import TransacaoP from "../models/TransacaoP";
 
 class AlunoController {
 
@@ -216,21 +218,29 @@ class AlunoController {
 
   public get: GetRequestHandler<IAtributosAluno> = async (request, response) => {
 
-    const usuario = await Aluno.findOne({
+    const aluno = await Aluno.findOne({
       where: {
         id: request.params.id
       },
       include: [
         {
           model: Usuario, as: "usuario"
+        },
+        {
+          model: Transacao, as: "transacoes",
+          include: [
+            {
+              model: TransacaoP, as: "transacaop",
+            }
+          ]
         }
       ],
       paranoid: false
     });
-    if (!usuario) {
-      return response.status(404).json(usuario);
+    if (!aluno) {
+      return response.status(404).json(aluno);
     } else {
-      return response.status(200).json(usuario);
+      return response.status(200).json(aluno);
     }
   }
 

@@ -1,9 +1,11 @@
 import { RequestHandler } from 'express'
-import { CreateResponse, DeleteResponse, ReadResponse, UpdateResponse } from './Responses'
+import { CreateResponse, DeleteResponse, EnviarMoeda, ReadResponse, UpdateResponse } from './Responses'
 
 ///tipos dos handlers dos principais requests
 
 export type CreateRequestHandler<TRequestBody = any> = RequestHandler<never, CreateResponse, TRequestBody>;
+
+export type EnviarMPARequestHandler<TRequestBody = any> = RequestHandler<{ id: string }, EnviarMoeda, TRequestBody>;
 
 export type GetAllRequestHandler<TModel> = RequestHandler<never, ReadResponse<TModel>, never>;
 

@@ -14,7 +14,7 @@ module.exports = {
       rg: "MG-000.000",
       endereco: "BH, MG",
       cpf: "111.111.111-11",
-      saldo: 0,
+      saldo: 100,
     }], {});
   },
 

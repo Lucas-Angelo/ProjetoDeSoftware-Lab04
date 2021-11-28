@@ -11,6 +11,7 @@ interface ILoginUsuario {
 
 type SigninReponse = string | {
   autenticado: boolean,
+  usuario_id?: number,
   razao?: "Dados incorretos!",
   tipoUsuario?: string,
 }
@@ -37,7 +38,7 @@ class UsuarioController {
           });
         }
 
-        return res.status(200).send({ autenticado: true, tipoUsuario: usuario.get().tipo });
+        return res.status(200).send({ usuario_id: usuario.get().id, autenticado: true, tipoUsuario: usuario.get().tipo });
       })
       .catch(err => {
         return res.status(500).send("Erro -> " + err);

@@ -12,7 +12,7 @@ module.exports = {
       nome: "Laerte",
       departamento: "Software",
       cpf: "222.222.222-22",
-      saldo: 0,
+      saldo: 500,
     }], {});
   },
 
