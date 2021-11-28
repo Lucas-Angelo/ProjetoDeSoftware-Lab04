@@ -36,10 +36,10 @@ class UsuarioController {
           });
         }
 
-        res.status(200).send({ autenticado: true });
+        return res.status(200).send({ autenticado: true });
       })
       .catch(err => {
-        res.status(500).send("Erro -> " + err);
+        return res.status(500).send("Erro -> " + err);
       });
   }
 
@@ -109,13 +109,13 @@ class UsuarioController {
       }
     })
       .then(dado => {
-        response.status(204).json({
+        return response.status(204).json({
           deletado: true,
           dado
         });
       })
       .catch(function (error) {
-        response.status(500).json({
+        return response.status(500).json({
           deletado: false,
           errors: error
         });
@@ -152,7 +152,7 @@ class UsuarioController {
       }
     });
     if (!usuario) {
-      response.status(404).json({
+      return response.status(404).json({
         atualizado: false,
         nome: "Usuario não encontrado",
         erros: "O id que foi solicitado alteração não existe no banco de dados"
@@ -161,7 +161,7 @@ class UsuarioController {
       usuario.update({
         senha: senha,
       });
-      response.status(200).json({
+      return response.status(200).json({
         atualizado: true,
         id: usuario.id
       });
@@ -178,9 +178,9 @@ class UsuarioController {
       paranoid: false
     });
     if (!usuario) {
-      response.status(404).json(usuario);
+      return response.status(404).json(usuario);
     } else {
-      response.status(200).json(usuario);
+      return response.status(200).json(usuario);
     }
   }
 
@@ -195,14 +195,14 @@ class UsuarioController {
         Usuario.findAll({
           paranoid: false
         })
-        response.status(200).json({
+        return response.status(200).json({
           dados: usuarios.rows,
           quantidade: usuarios.rows.length,
           total: usuarios.count
         });
       })
       .catch(function (error) {
-        response.status(500).json({
+        return response.status(500).json({
           titulo: "Erro interno do servidor!",
           error
         });

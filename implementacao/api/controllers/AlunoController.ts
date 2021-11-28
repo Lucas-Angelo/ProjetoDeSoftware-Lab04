@@ -92,13 +92,13 @@ class AlunoController {
       }
     })
       .then(dado => {
-        response.status(204).json({
+        return response.status(204).json({
           deletado: true,
           dado
         });
       })
       .catch(function (error) {
-        response.status(500).json({
+        return response.status(500).json({
           deletado: false,
           errors: error
         });
@@ -152,7 +152,7 @@ class AlunoController {
       }
     });
     if (!usuario) {
-      response.status(404).json({
+      return response.status(404).json({
         atualizado: false,
         nome: "Aluno não encontrado",
         erros: "O id que foi solicitado alteração não existe no banco de dados"
@@ -161,7 +161,7 @@ class AlunoController {
       usuario.update({
         nome, email, rg, endereco, cpf, saldo
       });
-      response.status(200).json({
+      return response.status(200).json({
         atualizado: true,
         id: usuario.id
       });
@@ -183,9 +183,9 @@ class AlunoController {
       paranoid: false
     });
     if (!usuario) {
-      response.status(404).json(usuario);
+      return response.status(404).json(usuario);
     } else {
-      response.status(200).json(usuario);
+      return response.status(200).json(usuario);
     }
   }
 
@@ -202,14 +202,14 @@ class AlunoController {
       ],
     })
       .then(usuarios => {
-        response.status(200).json({
+        return response.status(200).json({
           dados: usuarios.rows,
           quantidade: usuarios.rows.length,
           total: usuarios.count
         });
       })
       .catch(function (error) {
-        response.status(500).json({
+        return response.status(500).json({
           titulo: "Erro interno do servidor!",
           error
         });
