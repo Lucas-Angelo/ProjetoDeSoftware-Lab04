@@ -44,6 +44,7 @@ class UsuarioController {
   }
 
   public create: CreateRequestHandler = async (request, response) => {
+    const tipos = ["A", "P"];
     const scheme = yup.object().shape({
       usuario: yup
         .string()
@@ -52,7 +53,8 @@ class UsuarioController {
         .string()
         .required("'senha' obrigatória!")
         .min(8, "'senha' deve ter no mínimo 8 caracteres!")
-        .max(64, "'senha' deve ter no máximo 64 caracteres!")
+        .max(64, "'senha' deve ter no máximo 64 caracteres!"),
+      tipo: yup.mixed().oneOf(tipos, `Tipo deve ser algum destes: ${tipos}.`).required(),
     });
 
     // Validando com o esquema criado:
@@ -66,14 +68,15 @@ class UsuarioController {
       });
     }
 
-    const { usuario, senha } = request.body;
+    const { usuario, senha, tipo } = request.body;
 
     const user = Usuario.build({
       usuario,
-      senha: senha
+      senha: senha,
+      tipo
     });
 
-    user
+    await user
       .save()
       .then(() => {
         return response.status(201).json({
@@ -128,7 +131,6 @@ class UsuarioController {
     const scheme = yup.object().shape({
       senha: yup
         .string()
-        .required("'senha' obrigatória!")
         .min(8, "'senha' deve ter no mínimo 8 caracteres!")
         .max(64, "'senha' deve ter no máximo 64 caracteres!")
     });
@@ -158,7 +160,7 @@ class UsuarioController {
         erros: "O id que foi solicitado alteração não existe no banco de dados"
       });
     } else {
-      usuario.update({
+      await usuario.update({
         senha: senha,
       });
       return response.status(200).json({
@@ -184,17 +186,12 @@ class UsuarioController {
     }
   }
 
-  // URI de exemplo: http://localhost:3000/api/usuario?pagina=1&limite=5&atributo=nome&ordem=DESC
-  // todos as querys são opicionais
   public getAll: GetAllRequestHandler<IAtributosUsuario> = async (request, response) => {
 
-    Usuario.findAndCountAll({
-      paranoid: false
+    await Usuario.findAndCountAll({
+      paranoid: false,
     })
       .then(usuarios => {
-        Usuario.findAll({
-          paranoid: false
-        })
         return response.status(200).json({
           dados: usuarios.rows,
           quantidade: usuarios.rows.length,
@@ -209,5 +206,6 @@ class UsuarioController {
       });
   }
 }
+
 
 export default UsuarioController;

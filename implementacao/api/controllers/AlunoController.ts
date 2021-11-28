@@ -8,10 +8,14 @@ class AlunoController {
 
   public create: CreateRequestHandler = async (request, response) => {
     const scheme = yup.object().shape({
-      usuario_id: yup
-        .number()
-        .required("'usuario_id' obrigatória!")
-        .required("'usuario_id' obrigatório!"),
+      usuario: yup
+        .string()
+        .required("'usuario' obrigatório!").max(100, "'usuario' deve ter no máximo 100 caracteres!"),
+      senha: yup
+        .string()
+        .required("'senha' obrigatória!")
+        .min(8, "'senha' deve ter no mínimo 8 caracteres!")
+        .max(64, "'senha' deve ter no máximo 64 caracteres!"),
       nome: yup
         .string()
         .required("'nome' obrigatória!")
@@ -50,13 +54,35 @@ class AlunoController {
       });
     }
 
-    const { usuario_id, nome, email, rg, endereco, cpf } = request.body;
+    const { nome, email, rg, endereco, cpf } = request.body;
+    const { usuario, senha } = request.body;
 
-    const aluno = Aluno.build({
-      usuario_id, nome, email, rg, endereco, cpf, saldo: 0
+    const user = Usuario.build({
+      usuario,
+      senha,
+      tipo: "A"
     });
 
-    aluno
+    await user
+      .save()
+      .catch((erro) => {
+        return response.status(500).json({
+          criado: false,
+          erros: erro.message
+        });
+      });
+
+    const aluno = Aluno.build({
+      usuario_id: user.id,
+      nome,
+      email,
+      rg,
+      endereco,
+      cpf,
+      saldo: 0
+    });
+
+    await aluno
       .save()
       .then(() => {
         return response.status(201).json({
@@ -72,7 +98,6 @@ class AlunoController {
       });
   }
 
-  // URI de exemplo: http://localhost:3000/api/usuario/1
   public delete: DeleteRequestHandler = async (request, response) => {
     const usuario = await Aluno.findOne({
       where: {
@@ -105,10 +130,13 @@ class AlunoController {
       });
   }
 
-  // URI de exemplo: http://localhost:3000/api/usuario/1
-  public update: UpddateRequestHandler<IAtributosAluno> = async (request, response) => {
+  public update: UpddateRequestHandler = async (request, response) => {
 
     const scheme = yup.object().shape({
+      senha: yup
+        .string()
+        .min(8, "'senha' deve ter no mínimo 8 caracteres!")
+        .max(64, "'senha' deve ter no máximo 64 caracteres!"),
       nome: yup
         .string()
         .min(2, "'nome' deve ter no mínimo 2 caracteres!")
@@ -145,30 +173,48 @@ class AlunoController {
     }
 
     const { nome, email, rg, endereco, cpf, saldo } = request.body;
+    const { senha } = request.body;
 
-    const usuario = await Aluno.findOne({
+    const aluno = await Aluno.findOne({
       where: {
         id: request.params.id
       }
     });
-    if (!usuario) {
+    if (!aluno) {
       return response.status(404).json({
         atualizado: false,
         nome: "Aluno não encontrado",
         erros: "O id que foi solicitado alteração não existe no banco de dados"
       });
     } else {
-      usuario.update({
+      await aluno.update({
         nome, email, rg, endereco, cpf, saldo
       });
+      if (senha) {
+        const usuario = await Usuario.findOne({
+          where: {
+            id: aluno.usuario_id
+          }
+        });
+        if (!usuario) {
+          return response.status(404).json({
+            atualizado: false,
+            nome: "Usuario não encontrado",
+            erros: "O id que foi solicitado alteração não existe no banco de dados"
+          });
+        } else {
+          await usuario.update({
+            senha: senha,
+          });
+        }
+      }
       return response.status(200).json({
         atualizado: true,
-        id: usuario.id
+        id: aluno.id
       });
     }
   }
 
-  // URI de exemplo: http://localhost:3000/api/usuario/1
   public get: GetRequestHandler<IAtributosAluno> = async (request, response) => {
 
     const usuario = await Aluno.findOne({
@@ -189,11 +235,9 @@ class AlunoController {
     }
   }
 
-  // URI de exemplo: http://localhost:3000/api/usuario?pagina=1&limite=5&atributo=nome&ordem=DESC
-  // todos as querys são opicionais
   public getAll: GetAllRequestHandler<IAtributosAluno> = async (request, response) => {
 
-    Aluno.findAndCountAll({
+    await Aluno.findAndCountAll({
       paranoid: false,
       include: [
         {
@@ -201,11 +245,11 @@ class AlunoController {
         }
       ],
     })
-      .then(usuarios => {
+      .then(alunos => {
         return response.status(200).json({
-          dados: usuarios.rows,
-          quantidade: usuarios.rows.length,
-          total: usuarios.count
+          dados: alunos.rows,
+          quantidade: alunos.rows.length,
+          total: alunos.count
         });
       })
       .catch(function (error) {
