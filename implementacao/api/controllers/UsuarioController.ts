@@ -11,14 +11,14 @@ interface ILoginUsuario {
 
 type SigninReponse = string | {
   autenticado: boolean,
-  razao?: "Senha incorreta!"
+  razao?: "Dados incorretos!"
 }
 
 class UsuarioController {
   public signin: RequestHandler<never, SigninReponse, ILoginUsuario> = async (req, res) => {
     const { usuario, senha } = req.body;
 
-    Usuario.findOne({
+    await Usuario.findOne({
       attributes: ['id', 'senha'],
       where: {
         usuario: usuario
@@ -26,13 +26,13 @@ class UsuarioController {
     })
       .then(usuario => {
         if (!usuario) {
-          return res.status(404).send("Usuario nao encontrado.");
+          return res.status(404).send("Usuário não encontrado.");
         }
 
         if (senha != usuario.get().senha) {
           return res.status(401).send({
             autenticado: false,
-            razao: "Senha incorreta!"
+            razao: "Dados incorretos!"
           });
         }
 

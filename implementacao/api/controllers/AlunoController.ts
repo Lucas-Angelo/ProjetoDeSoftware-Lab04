@@ -188,7 +188,6 @@ class AlunoController {
         erros: "O id que foi solicitado alteração não existe no banco de dados"
       });
     } else {
-      console.log(nome, email, rg, endereco, cpf, saldo)
       await aluno.update({
         nome, email, rg, endereco, cpf, saldo
       });
