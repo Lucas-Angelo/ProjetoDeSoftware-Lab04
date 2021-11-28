@@ -11,7 +11,8 @@ interface ILoginUsuario {
 
 type SigninReponse = string | {
   autenticado: boolean,
-  razao?: "Dados incorretos!"
+  razao?: "Dados incorretos!",
+  tipoUsuario?: string,
 }
 
 class UsuarioController {
@@ -19,7 +20,7 @@ class UsuarioController {
     const { usuario, senha } = req.body;
 
     await Usuario.findOne({
-      attributes: ['id', 'senha'],
+      attributes: ['id', 'senha', 'tipo'],
       where: {
         usuario: usuario
       }
@@ -36,7 +37,7 @@ class UsuarioController {
           });
         }
 
-        return res.status(200).send({ autenticado: true });
+        return res.status(200).send({ autenticado: true, tipoUsuario: usuario.get().tipo });
       })
       .catch(err => {
         return res.status(500).send("Erro -> " + err);
