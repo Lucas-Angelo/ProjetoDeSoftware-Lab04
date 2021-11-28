@@ -10,6 +10,37 @@ import TransacaoP from "../models/TransacaoP";
 
 class ProfessorController {
 
+
+  public iniciarSemestre: GetAllRequestHandler<IAtributosProfessor> = async (request, response) => {
+    await Professor.findAndCountAll({
+      paranoid: false,
+      include: [
+        {
+          model: Usuario, as: "usuario"
+        }
+      ],
+    })
+      .then(async (professores) => {
+        professores.rows.forEach(async (professor) => {
+          professor.update({saldo: professor.get().saldo+1000});
+        });
+        return response.status(200).json({
+          dados: professores.rows,
+          quantidade: professores.rows.length,
+          total: professores.count
+        });
+      })
+      .catch(function (error) {
+        return response.status(500).json({
+          titulo: "Erro interno do servidor!",
+          error
+        });
+      });
+
+
+  }
+
+
   public enivarMoedas: EnviarMPARequestHandler = async (request, response) => {
     const scheme = yup.object().shape({
       professor_id: yup
@@ -67,7 +98,7 @@ class ProfessorController {
     if (!professor) {
       throw new AppError("Professor não encontrado!");
     }
-    if(professor.get().saldo<valor)
+    if (professor.get().saldo < valor)
       throw new AppError("Saldo insuficiente!");
 
     const transacao = Transacao.build({
@@ -88,10 +119,10 @@ class ProfessorController {
           .save()
           .then(async (transacaoP_criada) => {
             await professor.update({
-              saldo: professor.get().saldo-valor
+              saldo: professor.get().saldo - valor
             })
             await aluno.update({
-              saldo: aluno.get().saldo+valor
+              saldo: aluno.get().saldo + valor
             })
             return response.status(201).json({
               enviada: true,
