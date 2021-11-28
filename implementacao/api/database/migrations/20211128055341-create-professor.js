@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('aluno', {
+    await queryInterface.createTable('professor', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -19,15 +19,7 @@ module.exports = {
         type: Sequelize.STRING(120),
         allowNull: false
       },
-      email: {
-        type: Sequelize.STRING(120),
-        allowNull: false
-      },
-      rg: {
-        type: Sequelize.STRING(120),
-        allowNull: false
-      },
-      endereco: {
+      departamento: {
         type: Sequelize.STRING(120),
         allowNull: false
       },
@@ -42,6 +34,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('aluno');
+    await queryInterface.dropTable('professor');
   }
 };

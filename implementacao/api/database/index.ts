@@ -3,14 +3,15 @@ import dotenv from 'dotenv';
 import { Sequelize } from "sequelize";
 import Aluno from '../models/Aluno';
 import Parceiro from '../models/Parceiro';
+import Professor from '../models/Professor';
 import Usuario from "../models/Usuario";
 
 dotenv.config();
 
 const sequelize = new Sequelize(
-  process.env.DB_DATABASE?? "",
-  process.env.DB_USER?? "",
-  process.env.DB_PASS?? "",
+  process.env.DB_DATABASE ?? "",
+  process.env.DB_USER ?? "",
+  process.env.DB_PASS ?? "",
   {
     host: process.env.DB_HOST,
     dialect: "mysql",
@@ -24,9 +25,11 @@ export default {
       await sequelize.authenticate();
       Usuario.initialize(sequelize);
       Aluno.initialize(sequelize);
+      Professor.initialize(sequelize);
       Parceiro.initialize(sequelize);
 
-      Aluno.belongsTo(Usuario, {foreignKey: "usuario_id", as: "usuario"});
+      Aluno.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
+      Professor.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
 
       if (process.env.NODE_ENV === "dev") {
         console.log(
@@ -34,7 +37,7 @@ export default {
         );
       }
     } catch (error) {
-      console.log( error);
+      console.log(error);
     }
   },
 

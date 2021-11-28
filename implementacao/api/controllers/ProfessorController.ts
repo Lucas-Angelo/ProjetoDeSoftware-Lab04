@@ -1,10 +1,10 @@
-import Aluno, { IAtributosAluno } from "../models/Aluno";
+import Professor, { IAtributosProfessor } from "../models/Professor";
 
 import * as yup from 'yup'
 import { CreateRequestHandler, DeleteRequestHandler, GetAllRequestHandler, GetRequestHandler, UpddateRequestHandler } from "../types/RequestHandlers";
 import Usuario from "../models/Usuario";
 
-class AlunoController {
+class ProfessorController {
 
   public create: CreateRequestHandler = async (request, response) => {
     const scheme = yup.object().shape({
@@ -21,21 +21,11 @@ class AlunoController {
         .required("'nome' obrigatória!")
         .min(2, "'nome' deve ter no mínimo 2 caracteres!")
         .max(120, "'nome' deve ter no máximo 120 caracteres!"),
-      email: yup
+      departamento: yup
         .string()
-        .required("'email' obrigatória!")
-        .min(2, "'email' deve ter no mínimo 2 caracteres!")
-        .max(120, "'email' deve ter no máximo 120 caracteres!"),
-      rg: yup
-        .string()
-        .required("'rg' obrigatória!")
-        .min(2, "'rg' deve ter no mínimo 2 caracteres!")
-        .max(120, "'rg' deve ter no máximo 120 caracteres!"),
-      endereco: yup
-        .string()
-        .required("'endereco' obrigatória!")
-        .min(2, "'endereco' deve ter no mínimo 2 caracteres!")
-        .max(120, "'endereco' deve ter no máximo 120 caracteres!"),
+        .required("'departamento' obrigatória!")
+        .min(2, "'departamento' deve ter no mínimo 2 caracteres!")
+        .max(120, "'departamento' deve ter no máximo 120 caracteres!"),
       cpf: yup
         .string()
         .required("'cpf' obrigatória!")
@@ -54,13 +44,13 @@ class AlunoController {
       });
     }
 
-    const { nome, email, rg, endereco, cpf } = request.body;
+    const { nome, departamento, cpf } = request.body;
     const { usuario, senha } = request.body;
 
     const user = Usuario.build({
       usuario,
       senha,
-      tipo: "A"
+      tipo: "P"
     });
 
     await user
@@ -72,22 +62,20 @@ class AlunoController {
         });
       });
 
-    const aluno = Aluno.build({
+    const professor = Professor.build({
       usuario_id: user.id,
       nome,
-      email,
-      rg,
-      endereco,
+      departamento,
       cpf,
       saldo: 0
     });
 
-    await aluno
+    await professor
       .save()
       .then(() => {
         return response.status(201).json({
           criado: true,
-          id: aluno.id
+          id: professor.id
         });
       })
       .catch((erro) => {
@@ -99,19 +87,19 @@ class AlunoController {
   }
 
   public delete: DeleteRequestHandler = async (request, response) => {
-    const usuario = await Aluno.findOne({
+    const professor = await Professor.findOne({
       where: {
         id: request.params.id
       }
     });
-    if (!usuario) {
+    if (!professor) {
       return response.status(404).json({
         deletado: false,
         errors: "ID de usuário não encontrado!"
       });
     }
 
-    await Aluno.destroy({
+    await Professor.destroy({
       where: {
         id: request.params.id
       },
@@ -142,18 +130,10 @@ class AlunoController {
         .string()
         .min(2, "'nome' deve ter no mínimo 2 caracteres!")
         .max(120, "'nome' deve ter no máximo 120 caracteres!"),
-      email: yup
+      departamento: yup
         .string()
-        .min(2, "'email' deve ter no mínimo 2 caracteres!")
-        .max(120, "'email' deve ter no máximo 120 caracteres!"),
-      rg: yup
-        .string()
-        .min(2, "'rg' deve ter no mínimo 2 caracteres!")
-        .max(120, "'rg' deve ter no máximo 120 caracteres!"),
-      endereco: yup
-        .string()
-        .min(2, "'endereco' deve ter no mínimo 2 caracteres!")
-        .max(120, "'endereco' deve ter no máximo 120 caracteres!"),
+        .min(2, "'departamento' deve ter no mínimo 2 caracteres!")
+        .max(120, "'departamento' deve ter no máximo 120 caracteres!"),
       cpf: yup
         .string()
         .min(2, "'cpf' deve ter no mínimo 2 caracteres!")
@@ -173,28 +153,27 @@ class AlunoController {
       });
     }
 
-    const { nome, email, rg, endereco, cpf, saldo } = request.body;
+    const { nome, departamento, cpf, saldo } = request.body;
     const { senha } = request.body;
 
-    const aluno = await Aluno.findOne({
+    const professor = await Professor.findOne({
       where: {
         id: request.params.id
-      }
+      },
     });
-    if (!aluno) {
+    if (!professor) {
       return response.status(404).json({
         atualizado: false,
-        nome: "Aluno não encontrado",
+        nome: "Professor não encontrado",
         erros: "O id que foi solicitado alteração não existe no banco de dados"
       });
     } else {
-      console.log(nome, email, rg, endereco, cpf, saldo)
-      await aluno.update({
-        nome, email, rg, endereco, cpf, saldo
+      await professor.update({
+        nome, departamento, cpf, saldo
       });
       const usuario = await Usuario.findOne({
         where: {
-          id: aluno.get().usuario_id
+          id: professor.get().usuario_id
         }
       });
       if (!usuario) {
@@ -208,16 +187,17 @@ class AlunoController {
           senha: senha,
         });
       }
+
       return response.status(200).json({
         atualizado: true,
-        id: aluno.id
+        id: professor.id
       });
     }
   }
 
-  public get: GetRequestHandler<IAtributosAluno> = async (request, response) => {
+  public get: GetRequestHandler<IAtributosProfessor> = async (request, response) => {
 
-    const usuario = await Aluno.findOne({
+    const usuario = await Professor.findOne({
       where: {
         id: request.params.id
       },
@@ -235,9 +215,9 @@ class AlunoController {
     }
   }
 
-  public getAll: GetAllRequestHandler<IAtributosAluno> = async (request, response) => {
+  public getAll: GetAllRequestHandler<IAtributosProfessor> = async (request, response) => {
 
-    await Aluno.findAndCountAll({
+    await Professor.findAndCountAll({
       paranoid: false,
       include: [
         {
@@ -245,11 +225,11 @@ class AlunoController {
         }
       ],
     })
-      .then(alunos => {
+      .then(professors => {
         return response.status(200).json({
-          dados: alunos.rows,
-          quantidade: alunos.rows.length,
-          total: alunos.count
+          dados: professors.rows,
+          quantidade: professors.rows.length,
+          total: professors.count
         });
       })
       .catch(function (error) {
@@ -261,4 +241,4 @@ class AlunoController {
   }
 }
 
-export default AlunoController;
+export default ProfessorController;
