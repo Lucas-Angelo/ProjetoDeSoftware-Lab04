@@ -32,16 +32,16 @@ export default {
       Transacao.initialize(sequelize);
       TransacaoP.initialize(sequelize);
 
-      Aluno.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
-      Professor.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
+      Aluno.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario", onDelete: 'cascade', hooks:true });
+      Professor.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario", onDelete: 'cascade', hooks:true });
 
-      Transacao.hasOne(TransacaoP, {foreignKey: "id", as: "transacaop"});
+      Transacao.hasOne(TransacaoP, {foreignKey: "id", as: "transacaop", onDelete: 'cascade', hooks:true});
 
-      TransacaoP.belongsTo(Transacao, { foreignKey: "transacao_id", as: "transacao" });
-      TransacaoP.belongsTo(Professor, { foreignKey: "professor_id", as: "professor" });
+      TransacaoP.belongsTo(Transacao, { foreignKey: "transacao_id", as: "transacao", onDelete: 'cascade', hooks:true });
+      TransacaoP.belongsTo(Professor, { foreignKey: "professor_id", as: "professor", onDelete: 'cascade', hooks:true });
 
-      Professor.hasMany(TransacaoP, { foreignKey: "professor_id", as: "transacoesp" });
-      Aluno.hasMany(Transacao, {foreignKey: "aluno_id", as: "transacoes"});
+      Professor.hasMany(TransacaoP, { foreignKey: "professor_id", as: "transacoesp", onDelete: 'cascade', hooks:true });
+      Aluno.hasMany(Transacao, {foreignKey: "aluno_id", as: "transacoes", onDelete: 'cascade', hooks:true});
 
       if (process.env.NODE_ENV === "dev") {
         console.log(
