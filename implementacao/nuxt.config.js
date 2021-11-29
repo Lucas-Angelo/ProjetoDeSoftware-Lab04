@@ -26,6 +26,9 @@ export default {
   ** Global CSS
   */
   css: [
+    '@/assets/css/milligram.min.css',
+    '@/assets/css/bootstrap-grid.min.css',
+    '@/assets/css/index.css',
   ],
 
   /*
