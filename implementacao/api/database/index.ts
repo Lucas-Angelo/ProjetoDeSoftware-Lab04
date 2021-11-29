@@ -32,7 +32,9 @@ export default {
       Transacao.initialize(sequelize);
       TransacaoP.initialize(sequelize);
 
+      Usuario.hasOne(Aluno, { foreignKey: "usuario_id", as: "aluno" });
       Aluno.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario", onDelete: 'cascade', hooks:true });
+      Usuario.hasOne(Professor, { foreignKey: "usuario_id", as: "professor" });
       Professor.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario", onDelete: 'cascade', hooks:true });
 
       Transacao.hasOne(TransacaoP, {foreignKey: "id", as: "transacaop", onDelete: 'cascade', hooks:true});
