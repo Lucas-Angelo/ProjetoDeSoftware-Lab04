@@ -17,11 +17,12 @@ type SigninReponse = string | {
 }
 
 class UsuarioController {
-  public signin: RequestHandler<never, SigninReponse, ILoginUsuario> = async (req, res) => {
+  public signin: RequestHandler<never, any, ILoginUsuario> = async (req, res) => {
     const { usuario, senha } = req.body;
 
     await Usuario.findOne({
       attributes: ['id', 'senha', 'tipo'],
+      include: { all: true },
       where: {
         usuario: usuario
       }
@@ -38,7 +39,7 @@ class UsuarioController {
           });
         }
 
-        return res.status(200).send({ usuario_id: usuario.get().id, autenticado: true, tipoUsuario: usuario.get().tipo });
+        return res.status(200).send({ usuario_id: usuario.get().id, autenticado: true, tipoUsuario: usuario.get().tipo, resto: usuario });
       })
       .catch(err => {
         return res.status(500).send("Erro -> " + err);

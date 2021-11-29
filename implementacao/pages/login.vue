@@ -68,9 +68,11 @@ export default {
           localStorage.setItem('ccuid', res.data.usuario_id)
 
           const tipo = res.data.tipoUsuario
-          if(tipo == 'A')
+          if(tipo == 'A') {
+            localStorage.setItem('ccuid', res.data.resto.aluno.id)
             this.$router.push('dashboardaluno')
-          else if(tipo == 'P') {
+          } else if(tipo == 'P') {
+            localStorage.setItem('ccuid', res.data.resto.professor.id)
             this.$router.push('dashboardprofessor')
           }
         })
