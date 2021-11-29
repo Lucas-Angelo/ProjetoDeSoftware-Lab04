@@ -16,6 +16,10 @@ module.exports = {
       senha: {
         type: Sequelize.STRING(64),
         allowNull: false
+      },
+      tipo: {
+        type: Sequelize.ENUM('A', 'P'),
+        allowNull: false
       }
     })
   },
