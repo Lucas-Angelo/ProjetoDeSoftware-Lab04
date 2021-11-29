@@ -30,6 +30,7 @@ router.get('/professor', professorController.getAll)
 router.delete('/professor/:id', professorController.delete)
 router.put('/professor/:id', professorController.update)
 router.post('/professor/:id', professorController.enivarMoedas)
+router.put('/professor', professorController.iniciarSemestre)
 
 router.post('/parceiro', parceiroController.create)
 router.get('/parceiro/:id', parceiroController.get)
