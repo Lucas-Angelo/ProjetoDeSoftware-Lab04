@@ -67,13 +67,13 @@ class ProfessorController {
     if (!professor) {
       throw new AppError("Professor não encontrado!");
     }
-    if(professor.get().saldo<valor)
+    if(professor.get().saldo< parseFloat(valor))
       throw new AppError("Saldo insuficiente!");
 
     const transacao = Transacao.build({
       aluno_id: Number(request.params.id),
       tipo: "PA",
-      valor
+      valor: parseFloat(valor)
     });
 
     await transacao
@@ -88,10 +88,10 @@ class ProfessorController {
           .save()
           .then(async (transacaoP_criada) => {
             await professor.update({
-              saldo: professor.get().saldo-valor
+              saldo: professor.get().saldo - parseFloat(valor)
             })
             await aluno.update({
-              saldo: aluno.get().saldo+valor
+              saldo: aluno.get().saldo + parseFloat(valor)
             })
             return response.status(201).json({
               enviada: true,
