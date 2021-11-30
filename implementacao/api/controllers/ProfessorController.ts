@@ -100,6 +100,9 @@ class ProfessorController {
     }
     if(professor.get().saldo< parseFloat(valor))
       throw new AppError("Saldo insuficiente!");
+    if(parseFloat(valor)<=0) {
+      throw new AppError("Valor inválido!");
+    }
 
     const transacao = Transacao.build({
       aluno_id: Number(request.params.id),
