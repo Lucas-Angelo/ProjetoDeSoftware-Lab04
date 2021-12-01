@@ -9,7 +9,7 @@ module.exports = {
       tipo: "P",
     }], {});
     await queryInterface.bulkInsert('professor', [{
-      usuario_id: 2,
+      usuario_id: 3,
       nome: "Laerte",
       departamento: "Software",
       cpf: "222.222.222-22",
@@ -22,7 +22,7 @@ module.exports = {
       tipo: "P",
     }], {});
     await queryInterface.bulkInsert('professor', [{
-      usuario_id: 3,
+      usuario_id: 4,
       nome: "Soraia",
       departamento: "Software",
       cpf: "223.222.222-22",
@@ -35,7 +35,7 @@ module.exports = {
       tipo: "P",
     }], {});
     await queryInterface.bulkInsert('professor', [{
-      usuario_id: 4,
+      usuario_id: 5,
       nome: "Baroni",
       departamento: "Software",
       cpf: "224.222.222-22",
@@ -48,7 +48,7 @@ module.exports = {
       tipo: "P",
     }], {});
     return await queryInterface.bulkInsert('professor', [{
-      usuario_id: 5,
+      usuario_id: 6,
       nome: "Simone",
       departamento: "Software",
       cpf: "225.222.222-22",

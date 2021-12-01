@@ -2,11 +2,20 @@ import Parceiro, { IAtributosParceiro } from "../models/Parceiro";
 
 import * as yup from 'yup'
 import { CreateRequestHandler, DeleteRequestHandler, GetAllRequestHandler, GetRequestHandler, UpddateRequestHandler } from "../types/RequestHandlers";
+import Usuario from "../models/Usuario";
 
 class ParceiroController {
 
   public create: CreateRequestHandler = async (request, response) => {
     const scheme = yup.object().shape({
+      usuario: yup
+        .string()
+        .required("'usuario' obrigatório!").max(100, "'usuario' deve ter no máximo 100 caracteres!"),
+      senha: yup
+        .string()
+        .required("'senha' obrigatória!")
+        .min(8, "'senha' deve ter no mínimo 8 caracteres!")
+        .max(64, "'senha' deve ter no máximo 64 caracteres!"),
       nome: yup
         .string()
         .required("'nome' obrigatória!")
@@ -25,13 +34,30 @@ class ParceiroController {
       });
     }
 
-    const { nome } = request.body;
+    const { usuario, senha, nome } = request.body;
+
+
+    const user = Usuario.build({
+      usuario,
+      senha,
+      tipo: "E"
+    });
+
+    await user
+      .save()
+      .catch((erro) => {
+        return response.status(500).json({
+          criado: false,
+          erros: erro.message
+        });
+      });
 
     const parceiro = Parceiro.build({
+      usuario_id: user.id,
       nome
     });
 
-    parceiro
+    await parceiro
       .save()
       .then(() => {
         return response.status(201).json({
@@ -47,7 +73,6 @@ class ParceiroController {
       });
   }
 
-  // URI de exemplo: http://localhost:3000/api/parceiro/1
   public delete: DeleteRequestHandler = async (request, response) => {
     const parceiro = await Parceiro.findOne({
       where: {
@@ -57,7 +82,7 @@ class ParceiroController {
     if (!parceiro) {
       return response.status(404).json({
         deletado: false,
-        errors: "ID de usuário não encontrado!"
+        errors: "Id de parceiro não encontrado!"
       });
     }
 
@@ -80,13 +105,15 @@ class ParceiroController {
       });
   }
 
-  // URI de exemplo: http://localhost:3000/api/parceiro/1
-  public update: UpddateRequestHandler<IAtributosParceiro> = async (request, response) => {
+  public update: UpddateRequestHandler = async (request, response) => {
 
     const scheme = yup.object().shape({
+      senha: yup
+        .string()
+        .min(8, "'senha' deve ter no mínimo 8 caracteres!")
+        .max(64, "'senha' deve ter no máximo 64 caracteres!"),
       nome: yup
         .string()
-        .required("'nome' obrigatória!")
         .min(2, "'nome' deve ter no mínimo 2 caracteres!")
         .max(120, "'nome' deve ter no máximo 120 caracteres!")
     });
@@ -103,11 +130,12 @@ class ParceiroController {
     }
 
     const { nome } = request.body;
+    const { senha } = request.body;
 
     const parceiro = await Parceiro.findOne({
       where: {
         id: request.params.id
-      }
+      },
     });
     if (!parceiro) {
       return response.status(404).json({
@@ -116,9 +144,26 @@ class ParceiroController {
         erros: "O id que foi solicitado alteração não existe no banco de dados"
       });
     } else {
-      parceiro.update({
+      await parceiro.update({
         nome
       });
+      const usuario = await Usuario.findOne({
+        where: {
+          id: parceiro.get().usuario_id
+        }
+      });
+      if (!usuario) {
+        return response.status(404).json({
+          atualizado: false,
+          nome: "Usuario não encontrado",
+          erros: "O id que foi solicitado alteração não existe no banco de dados"
+        });
+      } else {
+        await usuario.update({
+          senha: senha,
+        });
+      }
+
       return response.status(200).json({
         atualizado: true,
         id: parceiro.id
@@ -126,7 +171,6 @@ class ParceiroController {
     }
   }
 
-  // URI de exemplo: http://localhost:3000/api/parceiro/1
   public get: GetRequestHandler<IAtributosParceiro> = async (request, response) => {
 
     const parceiro = await Parceiro.findOne({
@@ -142,21 +186,21 @@ class ParceiroController {
     }
   }
 
-  // URI de exemplo: http://localhost:3000/api/parceiro?pagina=1&limite=5&atributo=nome&ordem=DESC
-  // todos as querys são opicionais
   public getAll: GetAllRequestHandler<IAtributosParceiro> = async (request, response) => {
 
-    Parceiro.findAndCountAll({
-      paranoid: false
+    await Parceiro.findAndCountAll({
+      paranoid: false,
+      include: [
+        {
+          model: Usuario, as: "usuario"
+        }
+      ],
     })
-      .then(parceiros => {
-        Parceiro.findAll({
-          paranoid: false
-        })
+      .then(parceiro => {
         return response.status(200).json({
-          dados: parceiros.rows,
-          quantidade: parceiros.rows.length,
-          total: parceiros.count
+          dados: parceiro.rows,
+          quantidade: parceiro.rows.length,
+          total: parceiro.count
         });
       })
       .catch(function (error) {

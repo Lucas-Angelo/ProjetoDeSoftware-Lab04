@@ -133,12 +133,10 @@ class ProfessorController {
             });
           })
           .catch((erro) => {
-            console.log(erro)
             throw new AppError("TransacaoP não criada!" + erro);
           });
       })
       .catch((erro) => {
-        console.log(erro)
         throw new AppError("Transacao não criada!" + erro);
       });
   }

@@ -1,28 +1,36 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('parceiro', {
+    await queryInterface.createTable('vantagem', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      usuario_id: {
+      parceiro_id: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references : {
-          model : 'Usuario',
+          model : 'Parceiro',
           key : 'id'
         }
       },
-      nome: {
+      valor: {
+        type: Sequelize.DOUBLE(),
+        allowNull: false
+      },
+      descricao: {
         type: Sequelize.STRING(120),
         allowNull: false
       },
+      foto: {
+        type: Sequelize.STRING(120),
+        allowNull: false
+      }
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('parceiro');
+    await queryInterface.dropTable('vantagem');
   }
 };

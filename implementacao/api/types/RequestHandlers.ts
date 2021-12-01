@@ -7,6 +7,8 @@ export type CreateRequestHandler<TRequestBody = any> = RequestHandler<never, Cre
 
 export type EnviarMPARequestHandler<TRequestBody = any> = RequestHandler<{ id: string }, EnviarMoeda, TRequestBody>;
 
+export type ComprarRequestHandler<TRequestBody = any> = RequestHandler<{ id: string }, EnviarMoeda, TRequestBody>;
+
 export type GetAllRequestHandler<TModel> = RequestHandler<never, ReadResponse<TModel>, never>;
 
 export type GetRequestHandler<TModel> = RequestHandler<{ id: string }, TModel | undefined | null>
