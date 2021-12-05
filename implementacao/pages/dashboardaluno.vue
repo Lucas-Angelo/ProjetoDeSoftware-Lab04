@@ -22,6 +22,12 @@
       <div class="col-12 col-md-8 dash-aluno-transacao">
         <h4>
           Transações
+          <button
+            class="button button-outline float-right"
+            @click="modalEnviar = true"
+          >
+            Resgatar Vantagem
+          </button>
         </h4>
         <table>
           <thead>
@@ -32,8 +38,8 @@
           </thead>
           <tbody>
             <tr v-for="(t,tidx) in aluno.transacoes" :key="tidx">
-              <td>{{ t.valor }}</td>
-              <td>{{ t.transacaop.mensagem }}</td>
+              <td> {{ t.tipo == 'AV' ? '-': '' }} {{ t.valor }}</td>
+              <td>{{ t.transacaop ? t.transacaop.mensagem: 'Sem Mensagem' }}</td>
             </tr>
             <tr v-if="loading">
               <td>Carregando...</td>
@@ -82,6 +88,42 @@
         </form>
       </div>
     </div>
+    <div v-if="modalEnviar" class="modal-enviomoedas" @click="fecharModal">
+      <div class="modal-enviomoedas-container">
+        <table>
+          <thead>
+            <tr>
+              <th width="50px">Foto</th>
+              <th>Descricao</th>
+              <th>Valor</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(v,tidx) in vantagens" :key="tidx">
+              <td>
+                <img
+                  :src="v.foto"
+                  :alt="`${v.descricao} - Foto`"
+                  height="50px"
+                  width="100%"
+                />
+              </td>
+              <td>{{ v.descricao }}</td>
+              <td>{{ v.valor }}</td>
+              <td>
+                <button class="button button-outline" @click="resgatar(v)">
+                  Resgatar
+                </button>
+              </td>
+            </tr>
+            <tr v-if="loading">
+              <td>Carregando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -99,22 +141,21 @@ export default {
         rg: null,
         cpf: null,
       },
+      vantagens: [],
       formEdit: false,
-      loading: false
+      loading: false,
+      modalEnviar: false
     }
   },
   mounted(){
-    let id = localStorage.getItem('ccuid')
+    this.reloadAluno()
     this.$axios
-      .get(`/aluno/${id}`)
+      .get(`/vantagem`)
       .then(res => {
-        this.aluno = res.data
-        this.formData.usuario = this.aluno.usuario.usuario
-        this.formData.nome = this.aluno.nome
-        this.formData.email = this.aluno.email
-        this.formData.cpf = this.aluno.cpf
-        this.formData.rg = this.aluno.rg
-        this.formData.endereco = this.aluno.endereco
+        this.vantagens = res.data.dados
+      })
+      .catch(err => {
+        console.log(err)
       })
   },
   methods: {
@@ -139,6 +180,45 @@ export default {
             confirmButtonText: 'OK'
           })
         })
+    },
+    fecharModal(ev) {
+      if (ev.target.className == "modal-enviomoedas") this.modalEnviar = false;
+    },
+    reloadAluno(){
+      let id = localStorage.getItem('ccuid')
+      this.$axios
+        .get(`/aluno/${id}`)
+        .then(res => {
+          this.aluno = res.data
+          this.formData.usuario = this.aluno.usuario.usuario
+          this.formData.nome = this.aluno.nome
+          this.formData.email = this.aluno.email
+          this.formData.cpf = this.aluno.cpf
+          this.formData.rg = this.aluno.rg
+          this.formData.endereco = this.aluno.endereco
+        })
+    },
+    resgatar(vantagem){
+      this.$axios
+        .post(`/vantagem/${vantagem.id}`, {
+          aluno_id: this.aluno.id
+        })
+        .then(() => {
+          this.reloadAluno()
+          this.modalEnviar = false;
+          Swal.fire({
+            title: "Vantagem Resgatada",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+        })
+        .catch(err => {
+          Swal.fire({
+            title: err.response.data.message,
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        })
     }
   }
 }
@@ -147,5 +227,24 @@ export default {
 <style>
 .dash-aluno-transacao{
   border-right: 1px solid rgb(187, 187, 187);
+}
+.modal-enviomoedas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.308);
+  z-index: 10;
+}
+.modal-enviomoedas-container {
+  background: #fff;
+  position: fixed;
+  top: 50px;
+  left: 25%;
+  width: 50%;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 11;
 }
 </style>

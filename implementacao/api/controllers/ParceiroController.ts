@@ -3,6 +3,7 @@ import Parceiro, { IAtributosParceiro } from "../models/Parceiro";
 import * as yup from 'yup'
 import { CreateRequestHandler, DeleteRequestHandler, GetAllRequestHandler, GetRequestHandler, UpddateRequestHandler } from "../types/RequestHandlers";
 import Usuario from "../models/Usuario";
+import Vantagem from "../models/Vantagem";
 
 class ParceiroController {
 
@@ -177,6 +178,15 @@ class ParceiroController {
       where: {
         id: request.params.id
       },
+      include: [
+        {
+          model: Vantagem,
+          as: 'vantagens'
+        },{
+          model: Usuario,
+          as: "usuario"
+        },
+      ],
       paranoid: false
     });
     if (!parceiro) {
