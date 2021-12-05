@@ -2,6 +2,7 @@ import { Model, DataTypes, Sequelize, Optional } from "sequelize";
 
 export interface IAtributosParceiro {
   id: number,
+  usuario_id: number,
   nome: string,
 }
 export interface IAtributosParceiroCriacao extends Optional<IAtributosParceiro, 'id'> { }
@@ -9,6 +10,7 @@ export interface IAtributosParceiroCriacao extends Optional<IAtributosParceiro, 
 class Parceiro extends Model<IAtributosParceiro, IAtributosParceiroCriacao> implements IAtributosParceiro {
 
   id!: number;
+  usuario_id!: number;
   nome!: string;
 
   static initialize(sequelize: Sequelize) {
@@ -17,6 +19,13 @@ class Parceiro extends Model<IAtributosParceiro, IAtributosParceiroCriacao> impl
         type: DataTypes.INTEGER().UNSIGNED,
         primaryKey: true,
         autoIncrement: true
+      },
+      usuario_id: {
+        type: DataTypes.INTEGER().UNSIGNED,
+        references: {
+          model: Parceiro,
+          key: "id"
+        }
       },
       nome: {
         type: DataTypes.STRING(120),

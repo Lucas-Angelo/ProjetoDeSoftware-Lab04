@@ -27,7 +27,7 @@ class UsuarioController {
         usuario: usuario
       }
     })
-      .then(usuario => {
+      .then(async (usuario) => {
         if (!usuario) {
           return res.status(404).send("Usuário não encontrado.");
         }
@@ -39,7 +39,18 @@ class UsuarioController {
           });
         }
 
-        return res.status(200).send({ usuario_id: usuario.get().id, autenticado: true, tipoUsuario: usuario.get().tipo, resto: usuario });
+        const usuarioRetorno = await Usuario.findOne({
+          include: { all: true },
+          where: {
+            id: usuario.get().id
+          }
+        })
+
+        if (!usuarioRetorno) {
+          return res.status(404).send("Usuário não encontrado.");
+        }
+
+        return res.status(200).send({ usuario_id: usuarioRetorno.get().id, autenticado: true, tipoUsuario: usuarioRetorno.get().tipo, resto: usuarioRetorno });
       })
       .catch(err => {
         return res.status(500).send("Erro -> " + err);
@@ -47,7 +58,7 @@ class UsuarioController {
   }
 
   public create: CreateRequestHandler = async (request, response) => {
-    const tipos = ["A", "P"];
+    const tipos = ["A", "P", "E"];
     const scheme = yup.object().shape({
       usuario: yup
         .string()

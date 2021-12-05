@@ -4,7 +4,7 @@ export interface IAtributosUsuario {
   id: number,
   usuario: string,
   senha: string,
-  tipo: 'A' | 'P'
+  tipo: 'A' | 'P' | 'E'
 }
 export interface IAtributosUsuarioCriacao extends Optional<IAtributosUsuario, 'id'> { }
 
@@ -31,7 +31,7 @@ class Usuario extends Model<IAtributosUsuario, IAtributosUsuarioCriacao> impleme
         allowNull: false
       },
       tipo: {
-        type: DataTypes.ENUM("A", "P"),
+        type: DataTypes.ENUM("A", "P", "E"),
         allowNull: false
       }
     },
