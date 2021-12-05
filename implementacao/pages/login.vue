@@ -64,7 +64,6 @@ export default {
       this.$axios
         .post('/signin', this.formData)
         .then(res => {
-          console.log(res.data)
           localStorage.setItem('ccuid', res.data.usuario_id)
 
           const tipo = res.data.tipoUsuario
@@ -74,6 +73,9 @@ export default {
           } else if(tipo == 'P') {
             localStorage.setItem('ccuid', res.data.resto.professor.id)
             this.$router.push('dashboardprofessor')
+          } else if(tipo == 'E') {
+            localStorage.setItem('ccuid', res.data.resto.parceiro.id)
+            this.$router.push('dashboardparceiro')
           }
         })
         .catch(err => {

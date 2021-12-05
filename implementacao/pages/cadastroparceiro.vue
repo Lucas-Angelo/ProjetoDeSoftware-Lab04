@@ -16,9 +16,12 @@
           <div class="col">
             <form @submit="submit">
               <fieldset>
+                <label for="userField">Usuário</label>
+                <input v-model="formData.usuario" required maxlength="100" type="text" id="userField">
+                <label for="passField">Senha</label>
+                <input v-model="formData.senha" required minlength="8" maxlength="64" type="password" id="passField">
                 <label for="nameField">Nome</label>
                 <input v-model="formData.nome" required maxlength="120" type="text" id="nameField">
-                
                 <button class="button-primary d-block w-100" type="submit">
                   Cadastrar
                 </button>
@@ -37,7 +40,9 @@ export default {
   data(){
     return {
       formData: {
-        nome: null
+        nome: null,
+        usuario: null,
+        senha: null
       }
     }
   },

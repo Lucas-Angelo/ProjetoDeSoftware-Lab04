@@ -49,7 +49,7 @@ export default {
       Professor.hasMany(TransacaoP, { foreignKey: "professor_id", as: "transacoesp", onDelete: 'cascade', hooks:true });
       Aluno.hasMany(Transacao, {foreignKey: "aluno_id", as: "transacoes", onDelete: 'cascade', hooks:true});
 
-      Parceiro.hasMany(Vantagem, { foreignKey: "id", as: "vantagens" });
+      Parceiro.hasMany(Vantagem, { foreignKey: "parceiro_id", as: "vantagens" });
       Vantagem.belongsTo(Parceiro, { foreignKey: "parceiro_id", as: "parceiro" });
 
       if (process.env.NODE_ENV === "dev") {
